@@ -1,0 +1,189 @@
+<mat-sidenav-container class="sidenav-container" >
+  <!-- <mat-sidenav #drawer class="sidenav"
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false"> -->
+      <mat-sidenav #drawer autosize = "true" class = "sidenav" mode ="over" [(opened)] = "opened">
+    <mat-toolbar>Menu</mat-toolbar>
+      
+    <mat-nav-list>
+      <a
+        mat-button
+        (click)="frame1.show()"
+        
+        >Add DashboardConfiguration
+      </a>
+      <ol>
+        <div *ngFor = "let item of dashboardConfigs ">
+          <li>
+            <div>
+              <a mat-button (click) ="navigateToDashboard(item.id)" routerLinkActive="active"> {{item.name}}</a>
+              <a class="editButton" style="float:right" mat-button (click) = "openEditModal(item.id)" routerLinkActive="active">
+                <mat-icon>edit</mat-icon>
+              </a>
+            </div>
+          <ul>
+            <div *ngFor = "let widget of item.widget; let i=index" >
+             <li>
+              {{widget?.name}} 
+             </li> 
+        </div> 
+          </ul>
+          
+        </li>
+        </div>
+      </ol>
+      </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        
+      </button>
+      <span>Dashboard widgets Project</span>
+    </mat-toolbar>
+    <ngb-alert #selfClosingAlert *ngIf="successMessage" type="success" (closed)="successMessage = ''">{{ successMessage }}
+    </ngb-alert>
+    <ngb-alert #selfClosingAlert *ngIf="warningMessage" type="warning" (closed)="warningMessage = ''">{{ warningMessage }}
+    </ngb-alert>
+    <router-outlet> </router-outlet>
+  </mat-sidenav-content>   
+
+</mat-sidenav-container>
+
+
+<div
+  mdbModal
+  #frame1="mdbModal"
+  class="modal fade top"
+  id="frameModalTop"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+  style="overflow-y: auto"
+>
+  <!--Dialog-->
+  <div class="modal-dialog modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content">
+      <!--Header-->
+      <div class="modal-header text-center">
+        <h4 class="modal-title white-text w-100 font-weight-bold py-2">
+          Create Dashboard Configuration
+        </h4>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="frame1.hide()"
+        >
+          <span aria-hidden="true" class="white-text">&times;</span>
+        </button>
+      </div>
+
+      <!--Body-->
+      <div class="modal-body">
+        <div>
+        <label for="name">Name</label>
+        <input type="text" name="name" required minlength="4" [(ngModel)]="newDashboardConfig.name">
+        </div>
+        <div>
+          <label for="description">Description</label>
+          <input type="text" name="description" required minlength="10" [(ngModel)]="newDashboardConfig.description">
+          </div>
+      </div>
+      <!--/.Body-->
+
+      <!--Footer-->
+      <div class="modal-footer justify-content-center">
+        <button
+          type="button"
+          mdbBtn
+          color="info"
+          class="waves-effect"
+          mdbWavesEffect
+          (click) = "addConfiguration()"
+        >
+          Add
+        </button>
+      </div>
+      <!--Footer-->
+    </div>
+    <!--/.Content-->
+  </div>
+  <!--/.Dialog-->
+</div>
+
+
+
+<div
+  mdbModal
+  #frame2="mdbModal"
+  class="modal fade top"
+  id="editFrameModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+  style="overflow-y: auto"
+  (onHide) = "onHideEditModal()"
+>
+  <!--Dialog-->
+  <div class="modal-dialog modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content">
+      <!--Header-->
+      <div class="modal-header text-center">
+        <h4 class="modal-title white-text w-100 font-weight-bold py-2">
+          Create Dashboard Configuration
+        </h4>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="frame2.hide()"
+        >
+          <span aria-hidden="true" class="white-text">&times;</span>
+        </button>
+      </div>
+
+      <!--Body-->
+      <div class="modal-body">
+        <div>
+        <label for="name">Name</label>
+        <input type="text" name="name" required minlength="4" [(ngModel)]="editDashboardConfig.name">
+        </div>
+        <div>
+          <label for="description">Description</label>
+          <input type="text" name="description" required minlength="10" [(ngModel)]="editDashboardConfig.description">
+          </div>
+      </div>
+      <!--/.Body-->
+
+      <!--Footer-->
+      <div class="modal-footer justify-content-center">
+        <button
+          type="button"
+          mdbBtn
+          color="info"
+          class="waves-effect"
+          mdbWavesEffect
+          (click) = "editSelectedConfiguration()"
+        >
+          Add
+        </button>
+      </div>
+      <!--Footer-->
+    </div>
+    <!--/.Content-->
+  </div>
+  <!--/.Dialog-->
+</div>

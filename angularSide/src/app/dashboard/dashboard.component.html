@@ -1,0 +1,214 @@
+
+    <mat-toolbar  color="primary">
+      <button style="float: right;" mat-button (click)="showModal()" > Add Widget
+  <mat-icon>add</mat-icon></button>
+  <span ></span>
+  <button style="float: right;"mat-button (click)="saveConfiguration()" > Save Configuration
+    <mat-icon>save</mat-icon></button>
+  
+    </mat-toolbar>
+      <gridster [options]="options">
+        
+        <gridster-item  *ngFor="let item of widgets; let i = index"  [item]="item">
+          
+          <ng-container [ngSwitch]="widgetsArray[i]">
+
+            <a mat-button style ="color:green; align-self: flex-end;" (mousedown)="removeItem($event, item)"
+                (touchstart)="removeItem($event, item)">
+              <mat-icon>delete</mat-icon></a>
+              <a style ="color:green; align-self: flex-end;" class="editButton" mat-button (click) = "openEditModal(item,i)" routerLinkActive="active">
+              <mat-icon>edit</mat-icon>
+              </a>
+              <h2 style="margin-left: 20px ;align-self: center; color:blue">Name : {{item.element.name}}</h2>
+            <ng-container  *ngSwitchCase="'lineChart'">
+                <div style="display: block">
+                  <highcharts-chart (resize) = "highChartBar.reflow()" 
+                    [Highcharts]="highChartBar"
+                    [options]="getLineChartOptions()"
+                    style="width: 100%; height:inherit; display: block;" ></highcharts-chart>
+
+                </div>
+            </ng-container>
+            <ng-container  *ngSwitchCase="'pieChart'">
+              <div style="display: block">
+                <highcharts-chart 
+                  [Highcharts]="highChartBar"
+                  [options]="getPieChartOptions()"
+                  style="width: 100%; height:inherit; display: block;" ></highcharts-chart>
+
+              </div>
+            </ng-container>
+            <ng-container  *ngSwitchCase="'barChart'">
+                <div style="display: block">
+                  <highcharts-chart 
+                    [Highcharts]="highChartBar"
+                    [options]="getBarChartOptions()"
+                    style="width: 100%; height:inherit; display: block;" ></highcharts-chart>
+
+                </div>
+            </ng-container>
+            <ng-container  *ngSwitchCase="'columnChart'">
+              <div style="display: block">
+                <highcharts-chart 
+                  [ngOnLoad] = "chartReflow()"
+                  [Highcharts]="highChartBar"
+                  [options]="getColumnChartOptions()"
+                  style="width: 100%; height:inherit; display: block;" ></highcharts-chart>
+
+              </div>
+          </ng-container>
+            <ng-container *ngSwitchCaseDefault>
+              <div>
+                Empty
+              </div>
+            </ng-container>
+          </ng-container>
+        </gridster-item>
+      </gridster>
+    
+
+      
+<div
+  mdbModal
+  #frame="mdbModal"
+  class="modal top"
+  id="frameModalTop"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+  style="overflow-y: auto"
+>
+  <!--Dialog-->
+  <div class="modal-dialog modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content">
+      <!--Header-->
+      <div class="modal-header text-center">
+        <h4 class="modal-title white-text w-100 font-weight-bold py-2">
+          Create Dashboard Widget
+        </h4>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="hideAdditionModal()"
+        >
+          <span aria-hidden="true" class="white-text">&times;</span>
+        </button>
+      </div>
+
+      <!--Body-->
+      <div class="modal-body">
+        <div>
+        <label for="name">Name</label>
+        <input type="text" name="name" required minlength="4" [(ngModel)]="newDashboardWidget.name">
+        </div>
+        <ngb-alert #selfClosingAlert *ngIf="warningMessage" type="warning" (closed)="warningMessage = ''">{{ warningMessage }}
+        </ngb-alert>
+        <div>
+          
+            <mat-label>Chart Type</mat-label>
+            <select [(ngModel)] = "newDashboardWidget.chartType">
+              <option *ngFor="let type of chartTypes" [value]= "type.value" >{{type.viewValue}} 
+
+              </option>
+              
+              </select>
+          
+        </div>
+      </div>
+      <!--/.Body-->
+
+      <!--Footer-->
+      <div class="modal-footer justify-content-center">
+        <button
+          type="button"
+          mdbBtn
+          color="info"
+          class="waves-effect"
+          mdbWavesEffect
+          (click) = "addItem()"
+        >
+          Add
+        </button>
+      </div>
+      <!--Footer-->
+    </div>
+    <!--/.Content-->
+  </div>
+  <!--/.Dialog-->
+</div>
+
+
+<div
+  mdbModal
+  #frameEdit="mdbModal"
+  class="modal top"
+  id="frameModalEditTop"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true"
+  style="overflow-y: auto"
+>
+  <!--Dialog-->
+  <div class="modal-dialog modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content">
+      <!--Header-->
+      <div class="modal-header text-center">
+        <h4 class="modal-title white-text w-100 font-weight-bold py-2">
+          Edit Dashboard Widget
+        </h4>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="hideEditModal()"
+        >
+          <span aria-hidden="true" class="white-text">&times;</span>
+        </button>
+      </div>
+
+      <!--Body-->
+      <div class="modal-body">
+        <div>
+        <label for="name">Name</label>
+        <input type="text" name="name" required minlength="4" [(ngModel)]="widgetToEdit.name">
+        </div>
+        <ngb-alert #selfClosingAlert *ngIf="warningMessage" type="warning" (closed)="warningMessage = ''">{{ warningMessage }}
+        </ngb-alert>
+        <div>
+          
+            <mat-label>Chart Type</mat-label>
+            <select [(ngModel)] = "widgetToEdit.chartType">
+              <option *ngFor="let type of chartTypes" [value]= "type.value" >{{type.viewValue}} 
+
+              </option>
+              
+              </select>
+          
+        </div>
+      </div>
+      <!--/.Body-->
+
+      <!--Footer-->
+      <div class="modal-footer justify-content-center">
+        <button
+          type="button"
+          mdbBtn
+          color="info"
+          class="waves-effect"
+          mdbWavesEffect
+          (click) = "editWidget()"
+        >
+          Save
+        </button>
+      </div>
+      <!--Footer-->
+    </div>
+    <!--/.Content-->
+  </div>
+  <!--/.Dialog-->
+</div>
